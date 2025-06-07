@@ -2,12 +2,12 @@
   "name": "NHO MANAGER SOFTWARE",
   "short_name": "NhoApp",
   "description": "Ứng dụng PWA đầu tiên của tôi",
-  "start_url": "/my-pwa-app/",
+  "start_url": "/my-pwa-app1/",
   "display": "standalone",
   "background_color": "#667eea",
   "theme_color": "#2196F3",
   "orientation": "portrait",
-  "scope": "/my-pwa-app/",
+  "scope": "/my-pwa-app1/",
   "lang": "vi",
   "icons": [
     {
