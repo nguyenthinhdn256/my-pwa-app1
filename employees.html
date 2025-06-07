@@ -1,0 +1,334 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Quản Lý Nhân Viên</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 20px;
+            background: transparent;
+            color: white;
+        }
+
+        .tab-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+            flex-wrap: wrap;
+            gap: 10px;
+        }
+
+        .tab-header h2 {
+            margin: 0;
+            font-size: 1.5em;
+        }
+
+        .button {
+            background: #4CAF50;
+            color: white;
+            border: none;
+            padding: 15px 30px;
+            font-size: 18px;
+            border-radius: 25px;
+            cursor: pointer;
+            margin: 10px;
+            transition: all 0.3s;
+            font-weight: bold;
+        }
+
+        .button:hover {
+            background: #45a049;
+            transform: translateY(-2px);
+        }
+
+        .add-btn {
+            background: #4CAF50;
+            padding: 10px 20px;
+            font-size: 14px;
+            border-radius: 20px;
+            margin: 0;
+        }
+
+        .search-box {
+            margin-bottom: 20px;
+        }
+
+        .search-box input {
+            width: 100%;
+            padding: 15px;
+            border: none;
+            border-radius: 10px;
+            font-size: 16px;
+            background: rgba(255,255,255,0.9);
+            color: #333;
+            box-sizing: border-box;
+        }
+
+        .employee-list {
+            max-height: 400px;
+            overflow-y: auto;
+        }
+
+        .list-item {
+            background: rgba(255,255,255,0.1);
+            padding: 15px;
+            margin-bottom: 10px;
+            border-radius: 10px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            transition: all 0.3s;
+        }
+
+        .list-item:hover {
+            background: rgba(255,255,255,0.2);
+            transform: translateY(-2px);
+        }
+
+        .item-info {
+            flex: 1;
+        }
+
+        .item-name {
+            font-weight: bold;
+            font-size: 16px;
+            margin-bottom: 5px;
+        }
+
+        .item-details {
+            font-size: 14px;
+            opacity: 0.8;
+        }
+
+        .item-actions {
+            display: flex;
+            gap: 8px;
+        }
+
+        .action-btn {
+            background: #2196F3;
+            color: white;
+            border: none;
+            padding: 8px 12px;
+            border-radius: 15px;
+            cursor: pointer;
+            font-size: 12px;
+            transition: all 0.3s;
+        }
+
+        .action-btn:hover {
+            background: #1976D2;
+        }
+
+        .action-btn.delete {
+            background: #f44336;
+        }
+
+        .action-btn.delete:hover {
+            background: #d32f2f;
+        }
+
+        .empty-state {
+            text-align: center;
+            padding: 40px 20px;
+            opacity: 0.7;
+        }
+
+        .empty-state-icon {
+            font-size: 3em;
+            margin-bottom: 15px;
+        }
+
+        @media (max-width: 480px) {
+            .tab-header {
+                flex-direction: column;
+                align-items: stretch;
+            }
+
+            .tab-header h2 {
+                text-align: center;
+                margin-bottom: 10px;
+            }
+
+            .list-item {
+                flex-direction: column;
+                align-items: stretch;
+                gap: 10px;
+            }
+
+            .item-actions {
+                justify-content: center;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="tab-header">
+        <h2>💼 Quản Lý Nhân Viên</h2>
+        <button class="button add-btn" onclick="showAddEmployeeForm()">+ Thêm Nhân Viên</button>
+    </div>
+    
+    <div class="search-box">
+        <input type="text" placeholder="🔍 Tìm kiếm nhân viên..." id="employeeSearch" onkeyup="searchEmployees()">
+    </div>
+    
+    <div class="employee-list" id="employeeList">
+        <!-- Employee items will be dynamically added here -->
+    </div>
+
+    <script>
+        let employees = [];
+
+        // Load data when page loads
+        window.onload = function() {
+            loadEmployees();
+            renderEmployees();
+        }
+
+        function loadEmployees() {
+            const savedEmployees = localStorage.getItem('employees');
+            if (savedEmployees) {
+                employees = JSON.parse(savedEmployees);
+            } else {
+                // Sample data
+                employees = [
+                    { id: 1, name: 'Phạm Văn C', position: 'Quản lý', phone: '0111222333', email: 'phamvanc@company.com', department: 'Kinh doanh' },
+                    { id: 2, name: 'Lê Thị D', position: 'Nhân viên', phone: '0444555666', email: 'lethid@company.com', department: 'Kế toán' }
+                ];
+                saveEmployees();
+            }
+        }
+
+        function saveEmployees() {
+            localStorage.setItem('employees', JSON.stringify(employees));
+        }
+
+        function renderEmployees() {
+            const employeeList = document.getElementById('employeeList');
+            
+            if (employees.length === 0) {
+                employeeList.innerHTML = `
+                    <div class="empty-state">
+                        <div class="empty-state-icon">👨‍💼</div>
+                        <p>Chưa có nhân viên nào</p>
+                        <p style="font-size: 14px; opacity: 0.7;">Nhấn "Thêm Nhân Viên" để bắt đầu</p>
+                    </div>
+                `;
+                return;
+            }
+            
+            employeeList.innerHTML = employees.map(employee => `
+                <div class="list-item">
+                    <div class="item-info">
+                        <div class="item-name">${employee.name}</div>
+                        <div class="item-details">${employee.position} • ${employee.department} • ${employee.phone} • ${employee.email}</div>
+                    </div>
+                    <div class="item-actions">
+                        <button class="action-btn" onclick="editEmployee(${employee.id})">Sửa</button>
+                        <button class="action-btn delete" onclick="deleteEmployee(${employee.id})">Xóa</button>
+                    </div>
+                </div>
+            `).join('');
+        }
+
+        function showAddEmployeeForm() {
+            const name = prompt('Tên nhân viên:');
+            if (!name) return;
+            
+            const position = prompt('Chức vụ:');
+            if (!position) return;
+            
+            const department = prompt('Phòng ban:');
+            if (!department) return;
+            
+            const phone = prompt('Số điện thoại:');
+            if (!phone) return;
+            
+            const email = prompt('Email:');
+            if (!email) return;
+            
+            const newEmployee = {
+                id: Date.now(),
+                name,
+                position,
+                department,
+                phone,
+                email
+            };
+            
+            employees.push(newEmployee);
+            saveEmployees();
+            renderEmployees();
+            alert('Đã thêm nhân viên thành công!');
+        }
+
+        function editEmployee(id) {
+            const employee = employees.find(e => e.id === id);
+            if (!employee) return;
+            
+            const name = prompt('Tên nhân viên:', employee.name);
+            if (name === null) return;
+            
+            const position = prompt('Chức vụ:', employee.position);
+            if (position === null) return;
+            
+            const department = prompt('Phòng ban:', employee.department);
+            if (department === null) return;
+            
+            const phone = prompt('Số điện thoại:', employee.phone);
+            if (phone === null) return;
+            
+            const email = prompt('Email:', employee.email);
+            if (email === null) return;
+            
+            employee.name = name;
+            employee.position = position;
+            employee.department = department;
+            employee.phone = phone;
+            employee.email = email;
+            
+            saveEmployees();
+            renderEmployees();
+            alert('Đã cập nhật thông tin nhân viên!');
+        }
+
+        function deleteEmployee(id) {
+            if (confirm('Bạn có chắc muốn xóa nhân viên này?')) {
+                employees = employees.filter(e => e.id !== id);
+                saveEmployees();
+                renderEmployees();
+                alert('Đã xóa nhân viên!');
+            }
+        }
+
+        function searchEmployees() {
+            const searchTerm = document.getElementById('employeeSearch').value.toLowerCase();
+            const filteredEmployees = employees.filter(employee => 
+                employee.name.toLowerCase().includes(searchTerm) ||
+                employee.position.toLowerCase().includes(searchTerm) ||
+                employee.department.toLowerCase().includes(searchTerm) ||
+                employee.phone.includes(searchTerm) ||
+                employee.email.toLowerCase().includes(searchTerm)
+            );
+            
+            const employeeList = document.getElementById('employeeList');
+            employeeList.innerHTML = filteredEmployees.map(employee => `
+                <div class="list-item">
+                    <div class="item-info">
+                        <div class="item-name">${employee.name}</div>
+                        <div class="item-details">${employee.position} • ${employee.department} • ${employee.phone} • ${employee.email}</div>
+                    </div>
+                    <div class="item-actions">
+                        <button class="action-btn" onclick="editEmployee(${employee.id})">Sửa</button>
+                        <button class="action-btn delete" onclick="deleteEmployee(${employee.id})">Xóa</button>
+                    </div>
+                </div>
+            `).join('');
+        }
+    </script>
+</body>
+</html>

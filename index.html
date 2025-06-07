@@ -1,0 +1,464 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>NHO MANAGER SOFTWARE</title>
+    <link rel="manifest" href="manifest.json">
+    <meta name="theme-color" content="#2196F3">
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 20px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .container {
+            text-align: center;
+            background: rgba(255,255,255,0.1);
+            padding: 40px;
+            border-radius: 20px;
+            backdrop-filter: blur(10px);
+            box-shadow: 0 8px 32px rgba(0,0,0,0.3);
+            width: 100%;
+            max-width: 800px;
+        }
+
+        .login-container {
+            display: block;
+        }
+
+        .app-container {
+            display: none;
+        }
+
+        h1 {
+            font-size: 2.5em;
+            margin-bottom: 20px;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.5);
+        }
+
+        .logo {
+            font-size: 4em;
+            margin-bottom: 20px;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.5);
+        }
+
+        .form-group {
+            margin-bottom: 20px;
+            text-align: left;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: bold;
+            font-size: 14px;
+        }
+
+        .form-group input {
+            width: 100%;
+            padding: 15px;
+            border: none;
+            border-radius: 10px;
+            font-size: 16px;
+            background: rgba(255,255,255,0.9);
+            color: #333;
+            box-sizing: border-box;
+        }
+
+        .form-group input:focus {
+            outline: none;
+            box-shadow: 0 0 0 3px rgba(255,255,255,0.3);
+        }
+
+        .button {
+            background: #4CAF50;
+            color: white;
+            border: none;
+            padding: 15px 30px;
+            font-size: 18px;
+            border-radius: 25px;
+            cursor: pointer;
+            margin: 10px;
+            transition: all 0.3s;
+            width: 100%;
+            font-weight: bold;
+        }
+
+        .button:hover {
+            background: #45a049;
+            transform: translateY(-2px);
+        }
+
+        .button:active {
+            transform: translateY(0);
+        }
+
+        .button.secondary {
+            background: #2196F3;
+        }
+
+        .button.secondary:hover {
+            background: #1976D2;
+        }
+
+        .error-message {
+            background: rgba(244, 67, 54, 0.9);
+            color: white;
+            padding: 10px;
+            border-radius: 8px;
+            margin: 10px 0;
+            display: none;
+            font-size: 14px;
+        }
+
+        .success-message {
+            background: rgba(76, 175, 80, 0.9);
+            color: white;
+            padding: 10px;
+            border-radius: 8px;
+            margin: 10px 0;
+            display: none;
+            font-size: 14px;
+        }
+
+        .user-info {
+            background: rgba(255,255,255,0.1);
+            padding: 15px;
+            border-radius: 10px;
+            margin-bottom: 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .logout-btn {
+            background: #f44336;
+            padding: 8px 16px;
+            font-size: 14px;
+            border-radius: 15px;
+            width: auto;
+        }
+
+        .logout-btn:hover {
+            background: #d32f2f;
+        }
+
+        /* Tab Styles */
+        .tab-navigation {
+            display: flex;
+            background: rgba(255,255,255,0.1);
+            border-radius: 15px;
+            padding: 5px;
+            margin: 20px 0;
+            gap: 5px;
+        }
+
+        .tab-btn {
+            flex: 1;
+            background: transparent;
+            color: rgba(255,255,255,0.7);
+            border: none;
+            padding: 15px 20px;
+            border-radius: 10px;
+            cursor: pointer;
+            transition: all 0.3s;
+            font-size: 16px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+        }
+
+        .tab-btn:hover {
+            background: rgba(255,255,255,0.1);
+            color: white;
+        }
+
+        .tab-btn.active {
+            background: rgba(255,255,255,0.2);
+            color: white;
+            font-weight: bold;
+        }
+
+        .tab-icon {
+            font-size: 18px;
+        }
+
+        /* Page Content */
+        .page-content {
+            margin-top: 20px;
+        }
+
+        .install-prompt {
+            display: none;
+            background: #ff9800;
+            padding: 10px;
+            border-radius: 10px;
+            margin: 20px 0;
+        }
+
+        @media (max-width: 480px) {
+            .container {
+                padding: 30px 20px;
+                margin: 10px;
+                max-width: 100%;
+            }
+            
+            h1 {
+                font-size: 2em;
+            }
+            
+            .logo {
+                font-size: 3em;
+            }
+
+            .tab-btn {
+                font-size: 14px;
+                padding: 12px 15px;
+            }
+
+            .user-info {
+                flex-direction: column;
+                gap: 10px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container login-container" id="loginContainer">
+        <div class="logo">🔐</div>
+        <h1>NHO MANAGER</h1>
+        <p>Vui lòng đăng nhập để tiếp tục</p>
+        
+        <div class="error-message" id="errorMessage"></div>
+        
+        <form id="loginForm">
+            <div class="form-group">
+                <label for="username">Tên đăng nhập:</label>
+                <input type="text" id="username" name="username" required autocomplete="username">
+            </div>
+            
+            <div class="form-group">
+                <label for="password">Mật khẩu:</label>
+                <input type="password" id="password" name="password" required autocomplete="current-password">
+            </div>
+            
+            <button type="submit" class="button">Đăng nhập</button>
+        </form>
+        
+        <p style="font-size: 12px; margin-top: 20px; opacity: 0.8;">
+            Demo: admin / 123456
+        </p>
+    </div>
+
+    <div class="container app-container" id="appContainer">
+        <div class="user-info">
+            <div>
+                <strong>Xin chào, <span id="currentUser"></span>!</strong>
+            </div>
+            <button class="button logout-btn" onclick="logout()">Đăng xuất</button>
+        </div>
+        
+        <h1>🚀 NHO MANAGER</h1>
+        <p>Hệ thống quản lý doanh nghiệp</p>
+        
+        <!-- Tab Navigation -->
+        <div class="tab-navigation">
+            <button class="tab-btn active" onclick="showPage('customers')" id="customersTab">
+                <span class="tab-icon">👥</span>
+                Khách Hàng
+            </button>
+            <button class="tab-btn" onclick="showPage('employees')" id="employeesTab">
+                <span class="tab-icon">👨‍💼</span>
+                Nhân Viên
+            </button>
+        </div>
+        
+        <!-- Page Content -->
+        <div class="page-content">
+            <iframe id="content-frame" src="customers.html" style="width: 100%; height: 500px; border: none; border-radius: 10px;"></iframe>
+        </div>
+        
+        <div id="install-prompt" class="install-prompt">
+            <p>📱 Bạn có thể cài đặt app này về màn hình chính!</p>
+            <button class="button" onclick="installApp()">Cài đặt</button>
+        </div>
+    </div>
+
+    <script>
+        let deferredPrompt;
+        
+        // Danh sách tài khoản demo
+        const accounts = {
+            'admin': '123456',
+            'user': 'password',
+            'demo': 'demo123'
+        };
+
+        // Kiểm tra đăng nhập khi load trang
+        window.onload = function() {
+            const savedUser = localStorage.getItem('currentUser');
+            if (savedUser) {
+                showApp(savedUser);
+            }
+
+            // Listen for messages from iframe
+            window.addEventListener('message', function(event) {
+                console.log('Received message:', event.data);
+                
+                if (event.data.action === 'switchToCustomers') {
+                    // Switch back to customers tab
+                    showPage('customers');
+                } else if (event.data.action === 'goToCustomers') {
+                    // Backward compatibility
+                    showPage('customers');
+                }
+            });
+        }
+
+        // Xử lý form đăng nhập
+        document.getElementById('loginForm').addEventListener('submit', function(e) {
+            e.preventDefault();
+            
+            const username = document.getElementById('username').value.trim();
+            const password = document.getElementById('password').value;
+            
+            if (validateLogin(username, password)) {
+                localStorage.setItem('currentUser', username);
+                showSuccessMessage('Đăng nhập thành công!');
+                setTimeout(() => {
+                    showApp(username);
+                }, 1000);
+            } else {
+                showErrorMessage('Tên đăng nhập hoặc mật khẩu không đúng!');
+            }
+        });
+
+        function validateLogin(username, password) {
+            return accounts[username] && accounts[username] === password;
+        }
+
+        function showApp(username) {
+            document.getElementById('loginContainer').style.display = 'none';
+            document.getElementById('appContainer').style.display = 'block';
+            document.getElementById('currentUser').textContent = username;
+        }
+
+        function logout() {
+            if (confirm('Bạn có chắc muốn đăng xuất?')) {
+                localStorage.removeItem('currentUser');
+                document.getElementById('loginContainer').style.display = 'block';
+                document.getElementById('appContainer').style.display = 'none';
+                
+                // Reset form
+                document.getElementById('loginForm').reset();
+                hideMessages();
+            }
+        }
+
+        function showErrorMessage(message) {
+            const errorDiv = document.getElementById('errorMessage');
+            errorDiv.textContent = message;
+            errorDiv.style.display = 'block';
+            setTimeout(hideMessages, 5000);
+        }
+
+        function showSuccessMessage(message) {
+            // Tạo success message element nếu chưa có
+            let successDiv = document.getElementById('successMessage');
+            if (!successDiv) {
+                successDiv = document.createElement('div');
+                successDiv.id = 'successMessage';
+                successDiv.className = 'success-message';
+                document.getElementById('errorMessage').parentNode.insertBefore(successDiv, document.getElementById('errorMessage').nextSibling);
+            }
+            
+            successDiv.textContent = message;
+            successDiv.style.display = 'block';
+            setTimeout(hideMessages, 3000);
+        }
+
+        function hideMessages() {
+            document.getElementById('errorMessage').style.display = 'none';
+            const successDiv = document.getElementById('successMessage');
+            if (successDiv) {
+                successDiv.style.display = 'none';
+            }
+        }
+
+        // Tab Functions
+        function showPage(pageName) {
+            console.log('Switching to page:', pageName);
+            
+            // Remove active from all buttons
+            document.querySelectorAll('.tab-btn').forEach(btn => {
+                btn.classList.remove('active');
+            });
+            
+            // Add active to clicked button
+            if (pageName === 'customers') {
+                document.getElementById('customersTab').classList.add('active');
+            } else if (pageName === 'employees') {
+                document.getElementById('employeesTab').classList.add('active');
+            }
+            
+            // Load page content with timestamp to force reload
+            const timestamp = Date.now();
+            document.getElementById('content-frame').src = pageName + '.html?' + timestamp;
+        }
+
+        // PWA Install prompt
+        window.addEventListener('beforeinstallprompt', (e) => {
+            e.preventDefault();
+            deferredPrompt = e;
+            document.getElementById('install-prompt').style.display = 'block';
+        });
+
+        function installApp() {
+            if (deferredPrompt) {
+                deferredPrompt.prompt();
+                deferredPrompt.userChoice.then((choiceResult) => {
+                    if (choiceResult.outcome === 'accepted') {
+                        console.log('User accepted the install prompt');
+                    }
+                    deferredPrompt = null;
+                    document.getElementById('install-prompt').style.display = 'none';
+                });
+            }
+        }
+
+        // Service Worker registration
+        if ('serviceWorker' in navigator) {
+            navigator.serviceWorker.register('sw.js')
+                .then(reg => console.log('SW registered'))
+                .catch(err => console.log('SW registration failed'));
+        }
+
+        // Tự động logout sau 30 phút không hoạt động
+        let inactiveTimer;
+        function resetInactiveTimer() {
+            clearTimeout(inactiveTimer);
+            inactiveTimer = setTimeout(() => {
+                if (localStorage.getItem('currentUser')) {
+                    alert('Phiên làm việc đã hết hạn. Vui lòng đăng nhập lại.');
+                    logout();
+                }
+            }, 30 * 60 * 1000); // 30 phút
+        }
+
+        // Reset timer khi có hoạt động
+        document.addEventListener('click', resetInactiveTimer);
+        document.addEventListener('keypress', resetInactiveTimer);
+        resetInactiveTimer();
+    </script>
+</body>
+</html>

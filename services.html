@@ -1,0 +1,726 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Menu Dịch Vụ</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 20px;
+            background: transparent;
+            color: white;
+        }
+
+        .page-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 30px;
+            flex-wrap: wrap;
+            gap: 15px;
+        }
+
+        .page-header h1 {
+            margin: 0;
+            font-size: 2em;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .back-btn {
+            background: #f44336;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            font-size: 14px;
+            border-radius: 20px;
+            cursor: pointer;
+            transition: all 0.3s;
+            font-weight: bold;
+        }
+
+        .back-btn:hover {
+            background: #d32f2f;
+            transform: translateY(-2px);
+        }
+
+        .service-tabs {
+            display: flex;
+            gap: 15px;
+            padding: 20px 0;
+            flex-wrap: wrap;
+            justify-content: center;
+            background: rgba(255,255,255,0.05);
+            border-radius: 15px;
+            margin-bottom: 30px;
+        }
+
+        .service-tab {
+            background: rgba(255,255,255,0.2);
+            color: white;
+            border: none;
+            padding: 15px 25px;
+            border-radius: 25px;
+            cursor: pointer;
+            font-size: 16px;
+            font-weight: bold;
+            transition: all 0.3s;
+            flex: 1;
+            min-width: 150px;
+        }
+
+        .service-tab:hover {
+            background: rgba(255,255,255,0.3);
+            transform: translateY(-3px);
+        }
+
+        .service-tab.active {
+            background: #4CAF50;
+            box-shadow: 0 6px 20px rgba(76, 175, 80, 0.4);
+        }
+
+        .service-content {
+            min-height: 400px;
+        }
+
+        .service-panel {
+            display: none;
+        }
+
+        .service-panel.active {
+            display: block;
+            animation: fadeIn 0.3s ease-in;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .service-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 25px;
+            padding: 20px;
+            background: rgba(255,255,255,0.1);
+            border-radius: 15px;
+        }
+
+        .service-header h2 {
+            margin: 0;
+            font-size: 1.5em;
+            color: white;
+        }
+
+        .create-service-btn {
+            background: #4CAF50;
+            color: white;
+            border: none;
+            padding: 12px 20px;
+            border-radius: 20px;
+            cursor: pointer;
+            font-size: 14px;
+            font-weight: bold;
+            transition: all 0.3s;
+        }
+
+        .create-service-btn:hover {
+            background: #45a049;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 15px rgba(76, 175, 80, 0.3);
+        }
+
+        .services-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 20px;
+        }
+
+        .service-item {
+            background: rgba(255,255,255,0.1);
+            padding: 20px;
+            border-radius: 15px;
+            border-left: 4px solid #4CAF50;
+            transition: all 0.3s;
+            backdrop-filter: blur(10px);
+        }
+
+        .service-item:hover {
+            background: rgba(255,255,255,0.2);
+            transform: translateY(-5px);
+            box-shadow: 0 8px 25px rgba(0,0,0,0.2);
+        }
+
+        .service-name {
+            font-weight: bold;
+            font-size: 18px;
+            color: white;
+            margin-bottom: 8px;
+        }
+
+        .service-price {
+            color: #FFD700;
+            font-size: 20px;
+            font-weight: bold;
+            margin-bottom: 8px;
+        }
+
+        .service-duration {
+            color: #4CAF50;
+            font-size: 14px;
+            font-weight: bold;
+            margin-bottom: 15px;
+        }
+
+        .service-actions {
+            display: flex;
+            gap: 10px;
+        }
+
+        .service-action-btn {
+            background: #2196F3;
+            color: white;
+            border: none;
+            padding: 8px 15px;
+            border-radius: 12px;
+            cursor: pointer;
+            font-size: 12px;
+            transition: all 0.3s;
+            font-weight: bold;
+        }
+
+        .service-action-btn:hover {
+            background: #1976D2;
+            transform: translateY(-2px);
+        }
+
+        .service-action-btn.delete {
+            background: #f44336;
+        }
+
+        .service-action-btn.delete:hover {
+            background: #d32f2f;
+        }
+
+        /* Modal Styles */
+        .modal {
+            display: none;
+            position: fixed;
+            z-index: 1000;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0,0,0,0.5);
+            backdrop-filter: blur(5px);
+        }
+
+        .modal-content {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            margin: 5% auto;
+            padding: 0;
+            border-radius: 20px;
+            width: 90%;
+            max-width: 500px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.3);
+            animation: modalSlideIn 0.3s ease-out;
+        }
+
+        @keyframes modalSlideIn {
+            from {
+                opacity: 0;
+                transform: translateY(-50px) scale(0.9);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0) scale(1);
+            }
+        }
+
+        .modal-header {
+            background: rgba(255,255,255,0.1);
+            padding: 20px 25px;
+            border-radius: 20px 20px 0 0;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-bottom: 1px solid rgba(255,255,255,0.2);
+        }
+
+        .modal-title {
+            margin: 0;
+            font-size: 1.4em;
+            font-weight: bold;
+            color: white;
+        }
+
+        .close {
+            color: white;
+            font-size: 28px;
+            font-weight: bold;
+            cursor: pointer;
+            transition: all 0.3s;
+            width: 35px;
+            height: 35px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 50%;
+        }
+
+        .close:hover {
+            background: rgba(255,255,255,0.2);
+            transform: rotate(90deg);
+        }
+
+        .modal-body {
+            padding: 20px 25px;
+        }
+
+        .form-group {
+            margin-bottom: 15px;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 5px;
+            font-weight: bold;
+            color: white;
+            font-size: 14px;
+        }
+
+        .form-group input {
+            width: 100%;
+            padding: 10px 12px;
+            border: none;
+            border-radius: 8px;
+            font-size: 14px;
+            background: rgba(255,255,255,0.9);
+            color: #333;
+            box-sizing: border-box;
+            transition: all 0.3s;
+        }
+
+        .form-group input:focus {
+            outline: none;
+            box-shadow: 0 0 0 3px rgba(255,255,255,0.3);
+            background: white;
+        }
+
+        .modal-footer {
+            padding: 15px 25px;
+            border-top: 1px solid rgba(255,255,255,0.2);
+            display: flex;
+            gap: 15px;
+            justify-content: center;
+        }
+
+        .btn {
+            padding: 10px 20px;
+            border: none;
+            border-radius: 20px;
+            font-size: 14px;
+            font-weight: bold;
+            cursor: pointer;
+            transition: all 0.3s;
+            min-width: 80px;
+        }
+
+        .btn-primary {
+            background: #4CAF50;
+            color: white;
+        }
+
+        .btn-primary:hover {
+            background: #45a049;
+            transform: translateY(-2px);
+        }
+
+        .btn-secondary {
+            background: rgba(255,255,255,0.2);
+            color: white;
+        }
+
+        .btn-secondary:hover {
+            background: rgba(255,255,255,0.3);
+        }
+
+        @media (max-width: 768px) {
+            .services-grid {
+                grid-template-columns: 1fr;
+            }
+            
+            .service-tabs {
+                flex-direction: column;
+                gap: 10px;
+            }
+            
+            .service-tab {
+                min-width: auto;
+            }
+            
+            .page-header {
+                flex-direction: column;
+                text-align: center;
+            }
+            
+            .page-header h1 {
+                font-size: 1.5em;
+            }
+
+            .service-actions {
+                justify-content: center;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="page-header">
+        <h1>📋 Menu Dịch Vụ</h1>
+        <button class="back-btn" onclick="goBack()">← Quay Lại</button>
+    </div>
+    
+    <div class="service-tabs">
+        <button class="service-tab active" onclick="showServiceTab('wash')">🧴 Gội Đầu</button>
+        <button class="service-tab" onclick="showServiceTab('health')">💪 Sức Khỏe</button>
+        <button class="service-tab" onclick="showServiceTab('facial')">✨ Chăm Sóc Mặt</button>
+        <button class="service-tab" onclick="showServiceTab('hair')">💇 Chăm Sóc Tóc</button>
+        <button class="service-tab" onclick="showServiceTab('combo')">🎁 Gói Combo Phục Hồi</button>
+    </div>
+    
+    <div class="service-content">
+        <!-- Gội Đầu -->
+        <div id="wash" class="service-panel active">
+            <div class="service-header">
+                <h2>🧴 Danh Sách Dịch Vụ Gội Đầu</h2>
+                <button class="create-service-btn" onclick="showCreateServiceModal('wash')">+ Tạo Dịch Vụ</button>
+            </div>
+            <div class="services-grid" id="wash-grid">
+                <!-- Services will be loaded here -->
+            </div>
+        </div>
+        
+        <!-- Sức Khỏe -->
+        <div id="health" class="service-panel">
+            <div class="service-header">
+                <h2>💪 Danh Sách Dịch Vụ Sức Khỏe</h2>
+                <button class="create-service-btn" onclick="showCreateServiceModal('health')">+ Tạo Dịch Vụ</button>
+            </div>
+            <div class="services-grid" id="health-grid">
+                <!-- Services will be loaded here -->
+            </div>
+        </div>
+        
+        <!-- Chăm Sóc Mặt -->
+        <div id="facial" class="service-panel">
+            <div class="service-header">
+                <h2>✨ Danh Sách Dịch Vụ Chăm Sóc Mặt</h2>
+                <button class="create-service-btn" onclick="showCreateServiceModal('facial')">+ Tạo Dịch Vụ</button>
+            </div>
+            <div class="services-grid" id="facial-grid">
+                <!-- Services will be loaded here -->
+            </div>
+        </div>
+        
+        <!-- Chăm Sóc Tóc -->
+        <div id="hair" class="service-panel">
+            <div class="service-header">
+                <h2>💇 Danh Sách Dịch Vụ Chăm Sóc Tóc</h2>
+                <button class="create-service-btn" onclick="showCreateServiceModal('hair')">+ Tạo Dịch Vụ</button>
+            </div>
+            <div class="services-grid" id="hair-grid">
+                <!-- Services will be loaded here -->
+            </div>
+        </div>
+        
+        <!-- Gói Combo -->
+        <div id="combo" class="service-panel">
+            <div class="service-header">
+                <h2>🎁 Danh Sách Gói Combo Phục Hồi</h2>
+                <button class="create-service-btn" onclick="showCreateServiceModal('combo')">+ Tạo Dịch Vụ</button>
+            </div>
+            <div class="services-grid" id="combo-grid">
+                <!-- Services will be loaded here -->
+            </div>
+        </div>
+    </div>
+
+    <!-- Create/Edit Service Modal -->
+    <div id="serviceModal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3 class="modal-title">Thông Tin Dịch Vụ</h3>
+                <span class="close" onclick="closeServiceModal()">&times;</span>
+            </div>
+            <div class="modal-body">
+                <form id="serviceForm">
+                    <div class="form-group">
+                        <label for="serviceName">Tên dịch vụ: <span style="color: #ff6b6b;">*</span></label>
+                        <input type="text" id="serviceName" name="serviceName" required placeholder="Nhập tên dịch vụ">
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="servicePrice">Giá dịch vụ: <span style="color: #ff6b6b;">*</span></label>
+                        <input type="number" id="servicePrice" name="servicePrice" required placeholder="Nhập giá dịch vụ (VNĐ)" min="0">
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="serviceTime">Thời gian: <span style="color: #ff6b6b;">*</span></label>
+                        <input type="text" id="serviceTime" name="serviceTime" required placeholder="VD: 30 phút, 1 giờ, 90 phút">
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" onclick="closeServiceModal()">Hủy</button>
+                <button type="button" class="btn btn-primary" onclick="saveService()">Lưu</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        let currentServiceCategory = '';
+        let editingServiceId = null;
+        let allServices = {};
+
+        // Default services data
+        const defaultServicesData = {
+            wash: [
+                { id: 'w1', name: '🧴 Gội Đầu Cơ Bản', price: 50000, description: 'Gội đầu với dầu gội thảo dược, massage nhẹ nhàng', time: '15 phút' },
+                { id: 'w2', name: '🌿 Gội Đầu Thảo Dược', price: 80000, description: 'Gội đầu với dầu gội thảo dược cao cấp, massage thư giãn', time: '25 phút' },
+                { id: 'w3', name: '💆 Gội + Massage Đầu', price: 120000, description: 'Gội đầu kết hợp massage da đầu chuyên sâu', time: '35 phút' }
+            ],
+            health: [
+                { id: 'h1', name: '💪 Massage Cổ Vai Gáy', price: 150000, description: 'Massage giảm căng thẳng vùng cổ vai gáy', time: '30 phút' },
+                { id: 'h2', name: '🧘 Thư Giãn Toàn Thân', price: 300000, description: 'Massage thư giãn toàn thân với tinh dầu thiên nhiên', time: '60 phút' },
+                { id: 'h3', name: '🔥 Đá Nóng Trị Liệu', price: 400000, description: 'Liệu pháp đá nóng kết hợp massage chuyên sâu', time: '75 phút' }
+            ],
+            facial: [
+                { id: 'f1', name: '✨ Làm Sạch Cơ Bản', price: 100000, description: 'Làm sạch sâu, tẩy tế bào chết, đắp mặt nạ cơ bản', time: '45 phút' },
+                { id: 'f2', name: '🌟 Chăm Sóc Da Chuyên Sâu', price: 200000, description: 'Làm sạch + tẩy da chết + massage mặt + mặt nạ cao cấp', time: '60 phút' },
+                { id: 'f3', name: '💎 Chăm Sóc Da VIP', price: 350000, description: 'Quy trình chăm sóc da 7 bước với sản phẩm cao cấp', time: '90 phút' }
+            ],
+            hair: [
+                { id: 'hr1', name: '💇 Cắt Tóc Cơ Bản', price: 80000, description: 'Cắt tóc theo yêu cầu + gội đầu', time: '30 phút' },
+                { id: 'hr2', name: '🎨 Nhuộm Tóc', price: 200000, description: 'Nhuộm tóc màu thời trang + dưỡng tóc', time: '90 phút' },
+                { id: 'hr3', name: '🌀 Uốn Tóc', price: 300000, description: 'Uốn tóc xoăn tự nhiên + chăm sóc tóc', time: '120 phút' },
+                { id: 'hr4', name: '🔥 Ép Tóc Thẳng', price: 250000, description: 'Ép tóc thẳng tự nhiên + dưỡng tóc', time: '90 phút' }
+            ],
+            combo: [
+                { id: 'c1', name: '🎁 Combo Thư Giãn Cơ Bản', price: 350000, description: 'Gội đầu + Massage cổ vai + Chăm sóc mặt cơ bản', time: '90 phút' },
+                { id: 'c2', name: '✨ Combo Làm Đẹp Toàn Diện', price: 600000, description: 'Chăm sóc da chuyên sâu + Cắt tóc + Massage thư giãn', time: '150 phút' },
+                { id: 'c3', name: '👑 Combo VIP Phục Hồi', price: 900000, description: 'Gói dịch vụ cao cấp: Chăm sóc da VIP + Massage toàn thân + Chăm sóc tóc chuyên sâu', time: '180 phút' },
+                { id: 'c4', name: '💎 Combo Luxury Spa', price: 1200000, description: 'Trải nghiệm spa sang trọng: Đá nóng trị liệu + Chăm sóc da VIP + Massage đầu + Uốn/nhuộm tóc cao cấp', time: '240 phút' }
+            ]
+        };
+
+        // Load data when page loads
+        window.onload = function() {
+            loadAllServices();
+            renderAllServices();
+        }
+
+        function loadAllServices() {
+            const savedServices = localStorage.getItem('allServices');
+            if (savedServices) {
+                allServices = JSON.parse(savedServices);
+            } else {
+                // Initialize with default services
+                allServices = JSON.parse(JSON.stringify(defaultServicesData));
+                saveAllServices();
+            }
+        }
+
+        function saveAllServices() {
+            localStorage.setItem('allServices', JSON.stringify(allServices));
+        }
+
+        function renderAllServices() {
+            for (const category in allServices) {
+                renderServicesForCategory(category);
+            }
+        }
+
+        function renderServicesForCategory(category) {
+            const grid = document.getElementById(category + '-grid');
+            if (!grid) return;
+
+            const services = allServices[category] || [];
+            grid.innerHTML = services.map(service => `
+                <div class="service-item">
+                    <div class="service-name">${service.name}</div>
+                    <div class="service-price">${service.price.toLocaleString()} VNĐ</div>
+                    <div class="service-duration">⏰ ${service.time}</div>
+                    <div class="service-actions">
+                        <button class="service-action-btn" onclick="editService('${category}', '${service.id}')">Sửa</button>
+                        <button class="service-action-btn delete" onclick="deleteService('${category}', '${service.id}')">Xóa</button>
+                    </div>
+                </div>
+            `).join('');
+        }
+
+        function goBack() {
+            try {
+                if (window.parent && window.parent !== window) {
+                    window.parent.postMessage({
+                        action: 'switchToCustomers'
+                    }, '*');
+                } else {
+                    window.location.href = 'index.html';
+                }
+            } catch (error) {
+                window.location.href = 'index.html';
+            }
+        }
+
+        function showServiceTab(tabName) {
+            // Remove active from all tabs
+            document.querySelectorAll('.service-tab').forEach(tab => {
+                tab.classList.remove('active');
+            });
+            
+            // Hide all panels
+            document.querySelectorAll('.service-panel').forEach(panel => {
+                panel.classList.remove('active');
+                panel.style.display = 'none';
+            });
+            
+            // Show clicked tab and panel
+            const clickedTab = event.target;
+            clickedTab.classList.add('active');
+            const panel = document.getElementById(tabName);
+            if (panel) {
+                panel.classList.add('active');
+                panel.style.display = 'block';
+            }
+        }
+
+        function showCreateServiceModal(category) {
+            currentServiceCategory = category;
+            editingServiceId = null;
+            document.querySelector('.modal-title').textContent = 'Thêm Dịch Vụ Mới';
+            document.querySelector('.btn-primary').textContent = 'Thêm';
+            document.getElementById('serviceForm').reset();
+            document.getElementById('serviceModal').style.display = 'block';
+            document.body.style.overflow = 'hidden';
+        }
+
+        function editService(category, serviceId) {
+            const service = allServices[category].find(s => s.id === serviceId);
+            if (!service) {
+                alert('Không tìm thấy dịch vụ!');
+                return;
+            }
+
+            currentServiceCategory = category;
+            editingServiceId = serviceId;
+            document.querySelector('.modal-title').textContent = 'Chỉnh Sửa Dịch Vụ';
+            document.querySelector('.btn-primary').textContent = 'Cập nhật';
+            
+            document.getElementById('serviceName').value = service.name;
+            document.getElementById('servicePrice').value = service.price;
+            document.getElementById('serviceTime').value = service.time;
+            
+            document.getElementById('serviceModal').style.display = 'block';
+            document.body.style.overflow = 'hidden';
+        }
+
+        function deleteService(category, serviceId) {
+            const service = allServices[category].find(s => s.id === serviceId);
+            if (!service) return;
+
+            if (confirm(`Bạn có chắc muốn xóa dịch vụ "${service.name}"?`)) {
+                allServices[category] = allServices[category].filter(s => s.id !== serviceId);
+                saveAllServices();
+                renderServicesForCategory(category);
+            }
+        }
+
+        function closeServiceModal() {
+            document.getElementById('serviceModal').style.display = 'none';
+            document.body.style.overflow = 'auto';
+            currentServiceCategory = '';
+            editingServiceId = null;
+        }
+
+        function saveService() {
+            const form = document.getElementById('serviceForm');
+            const formData = new FormData(form);
+            
+            const serviceName = formData.get('serviceName').trim();
+            const servicePrice = formData.get('servicePrice').trim();
+            const serviceTime = formData.get('serviceTime').trim();
+            
+            // Validation
+            if (!serviceName) {
+                alert('Vui lòng nhập tên dịch vụ!');
+                document.getElementById('serviceName').focus();
+                return;
+            }
+            
+            if (!servicePrice || servicePrice <= 0) {
+                alert('Vui lòng nhập giá dịch vụ hợp lệ!');
+                document.getElementById('servicePrice').focus();
+                return;
+            }
+            
+            if (!serviceTime) {
+                alert('Vui lòng nhập thời gian thực hiện!');
+                document.getElementById('serviceTime').focus();
+                return;
+            }
+            
+            if (editingServiceId) {
+                // Edit existing service
+                const serviceIndex = allServices[currentServiceCategory].findIndex(s => s.id === editingServiceId);
+                if (serviceIndex !== -1) {
+                    allServices[currentServiceCategory][serviceIndex] = {
+                        ...allServices[currentServiceCategory][serviceIndex],
+                        name: serviceName,
+                        price: parseInt(servicePrice),
+                        time: serviceTime,
+                        description: 'Dịch vụ chất lượng cao'
+                    };
+                }
+            } else {
+                // Create new service
+                const newService = {
+                    id: 'custom_' + Date.now(),
+                    name: serviceName,
+                    price: parseInt(servicePrice),
+                    time: serviceTime,
+                    description: 'Dịch vụ chất lượng cao',
+                    createdAt: new Date().toLocaleString('vi-VN')
+                };
+                
+                if (!allServices[currentServiceCategory]) {
+                    allServices[currentServiceCategory] = [];
+                }
+                allServices[currentServiceCategory].push(newService);
+            }
+            
+            saveAllServices();
+            renderServicesForCategory(currentServiceCategory);
+            closeServiceModal();
+        }
+
+        // Close modal when clicking outside
+        window.onclick = function(event) {
+            const modal = document.getElementById('serviceModal');
+            if (event.target == modal) {
+                closeServiceModal();
+            }
+        }
+
+        // Close modal with Escape key
+        document.addEventListener('keydown', function(event) {
+            if (event.key === 'Escape') {
+                closeServiceModal();
+            }
+        });
+    </script>
+</body>
+</html>

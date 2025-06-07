@@ -1,0 +1,385 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>🔧 Dev Runner</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+            background: #1a1a1a;
+            color: white;
+            overflow: hidden;
+        }
+        
+        .dev-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            background: linear-gradient(90deg, #ff6b6b, #ee5a24);
+            color: white;
+            padding: 8px 15px;
+            font-size: 14px;
+            font-weight: bold;
+            z-index: 10000;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        
+        .dev-controls {
+            position: fixed;
+            top: 50px;
+            right: 20px;
+            background: rgba(0,0,0,0.95);
+            color: white;
+            padding: 15px;
+            border-radius: 10px;
+            z-index: 9999;
+            font-size: 12px;
+            width: 250px;
+            transform: translateX(280px);
+            transition: transform 0.3s ease;
+            border: 2px solid #333;
+        }
+        
+        .dev-controls.show {
+            transform: translateX(0);
+        }
+        
+        .dev-toggle {
+            position: fixed;
+            top: 55px;
+            right: 10px;
+            background: #333;
+            color: white;
+            border: none;
+            padding: 8px 12px;
+            border-radius: 5px;
+            cursor: pointer;
+            z-index: 10001;
+            font-size: 12px;
+        }
+        
+        .dev-btn {
+            background: #4CAF50;
+            color: white;
+            border: none;
+            padding: 8px 12px;
+            margin: 3px 0;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 11px;
+            width: 100%;
+        }
+        
+        .dev-btn:hover {
+            background: #45a049;
+        }
+        
+        .dev-btn.danger {
+            background: #f44336;
+        }
+        
+        .dev-btn.secondary {
+            background: #2196F3;
+        }
+        
+        .dev-log {
+            background: #1a1a1a;
+            color: #00ff00;
+            font-family: 'Courier New', monospace;
+            font-size: 10px;
+            height: 100px;
+            overflow-y: auto;
+            padding: 8px;
+            margin: 10px 0;
+            border-radius: 4px;
+            border: 1px solid #333;
+        }
+        
+        #app-frame {
+            position: absolute;
+            top: 50px;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            border: none;
+            width: 100%;
+            height: calc(100vh - 50px);
+        }
+        
+        .loading {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            text-align: center;
+            z-index: 1000;
+        }
+        
+        .spinner {
+            border: 4px solid #333;
+            border-top: 4px solid #4CAF50;
+            border-radius: 50%;
+            width: 40px;
+            height: 40px;
+            animation: spin 1s linear infinite;
+            margin: 0 auto 20px;
+        }
+        
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+    </style>
+</head>
+<body>
+    <!-- Development Overlay -->
+    <div class="dev-overlay">
+        <div>🔧 DEV RUNNER - Loading: index.html</div>
+        <div id="dev-status">● STARTING</div>
+    </div>
+    
+    <!-- Dev Controls Toggle -->
+    <button class="dev-toggle" onclick="toggleDevControls()">⚙️</button>
+    
+    <!-- Development Controls Panel -->
+    <div class="dev-controls" id="devControls">
+        <div style="font-weight: bold; margin-bottom: 10px; color: #FFD700;">🛠️ Dev Controls</div>
+        
+        <button class="dev-btn" onclick="reloadFrame()">🔄 Reload App</button>
+        <button class="dev-btn secondary" onclick="openInNewTab()">🔗 Open in New Tab</button>
+        <button class="dev-btn" onclick="checkFiles()">📁 Check Files</button>
+        <button class="dev-btn" onclick="inspectManifest()">📋 Inspect Manifest</button>
+        <button class="dev-btn" onclick="testServiceWorker()">⚡ Test SW</button>
+        <button class="dev-btn danger" onclick="clearAllData()">💣 Clear All Data</button>
+        
+        <hr style="margin: 10px 0; border-color: #444;">
+        
+        <div style="font-size: 11px; margin-bottom: 5px;">📊 Debug Log:</div>
+        <div class="dev-log" id="devLog"></div>
+        
+        <button class="dev-btn secondary" onclick="clearLog()">Clear Log</button>
+        <button class="dev-btn secondary" onclick="exportLog()">Export Log</button>
+    </div>
+
+    <!-- Loading indicator -->
+    <div class="loading" id="loading">
+        <div class="spinner"></div>
+        <div>Loading original app...</div>
+    </div>
+
+    <!-- Main app frame - loads index.html -->
+    <iframe id="app-frame" src="index.html" onload="onAppLoaded()"></iframe>
+
+    <script>
+        // Development Logger
+        const devLog = {
+            messages: [],
+            log: function(message, type = 'info') {
+                const timestamp = new Date().toLocaleTimeString();
+                const logElement = document.getElementById('devLog');
+                const color = type === 'error' ? '#ff4444' : type === 'warn' ? '#ffaa00' : '#00ff00';
+                
+                const logEntry = `[${timestamp}] ${message}`;
+                this.messages.push(logEntry);
+                
+                if (logElement) {
+                    logElement.innerHTML += `<div style="color: ${color}">${logEntry}</div>`;
+                    logElement.scrollTop = logElement.scrollHeight;
+                }
+                
+                console.log(`[DEV] ${message}`);
+            }
+        };
+
+        // App loaded callback
+        function onAppLoaded() {
+            document.getElementById('loading').style.display = 'none';
+            document.getElementById('dev-status').textContent = '● READY';
+            document.getElementById('dev-status').style.color = '#4CAF50';
+            devLog.log('Original app loaded successfully');
+            
+            // Try to access app frame
+            try {
+                const frame = document.getElementById('app-frame');
+                if (frame.contentWindow) {
+                    devLog.log('App frame accessible');
+                }
+            } catch (error) {
+                devLog.log('Frame access limited (CORS)', 'warn');
+            }
+        }
+
+        // Development Controls
+        function toggleDevControls() {
+            const controls = document.getElementById('devControls');
+            controls.classList.toggle('show');
+            devLog.log('Dev controls toggled');
+        }
+
+        function reloadFrame() {
+            devLog.log('Reloading app frame...');
+            document.getElementById('loading').style.display = 'block';
+            document.getElementById('app-frame').src = 'index.html?' + Date.now();
+        }
+
+        function openInNewTab() {
+            devLog.log('Opening index.html in new tab');
+            window.open('index.html', '_blank');
+        }
+
+        async function checkFiles() {
+            devLog.log('Checking project files...');
+            
+            const files = ['index.html', 'manifest.json', 'sw.js', 'icon-192.png', 'icon-512.png'];
+            
+            for (const file of files) {
+                try {
+                    const response = await fetch(file, { method: 'HEAD' });
+                    if (response.ok) {
+                        devLog.log(`✅ ${file} - OK`);
+                    } else {
+                        devLog.log(`❌ ${file} - ${response.status}`, 'error');
+                    }
+                } catch (error) {
+                    devLog.log(`❌ ${file} - ${error.message}`, 'error');
+                }
+            }
+        }
+
+        async function inspectManifest() {
+            try {
+                devLog.log('Fetching manifest.json...');
+                const response = await fetch('manifest.json');
+                const manifest = await response.json();
+                
+                devLog.log(`Manifest: ${manifest.name}`);
+                devLog.log(`Short name: ${manifest.short_name}`);
+                devLog.log(`Start URL: ${manifest.start_url}`);
+                devLog.log(`Display: ${manifest.display}`);
+                devLog.log(`Icons: ${manifest.icons.length} found`);
+                
+                console.table(manifest);
+            } catch (error) {
+                devLog.log('Manifest error: ' + error.message, 'error');
+            }
+        }
+
+        async function testServiceWorker() {
+            if ('serviceWorker' in navigator) {
+                try {
+                    devLog.log('Testing Service Worker...');
+                    
+                    // Check if already registered
+                    const registration = await navigator.serviceWorker.getRegistration();
+                    if (registration) {
+                        devLog.log('SW already registered');
+                        devLog.log(`SW scope: ${registration.scope}`);
+                        devLog.log(`SW state: ${registration.active?.state || 'inactive'}`);
+                    } else {
+                        devLog.log('No SW registered, attempting registration...');
+                        const reg = await navigator.serviceWorker.register('sw.js');
+                        devLog.log('SW registered successfully');
+                    }
+                    
+                    // Check caches
+                    if ('caches' in window) {
+                        const cacheNames = await caches.keys();
+                        devLog.log(`Found ${cacheNames.length} cache(s): ${cacheNames.join(', ')}`);
+                    }
+                    
+                } catch (error) {
+                    devLog.log('SW test error: ' + error.message, 'error');
+                }
+            } else {
+                devLog.log('Service Worker not supported', 'warn');
+            }
+        }
+
+        async function clearAllData() {
+            if (confirm('⚠️ Clear all PWA data? (Cache, SW, LocalStorage)')) {
+                devLog.log('Clearing all data...', 'warn');
+                
+                // Clear localStorage
+                localStorage.clear();
+                devLog.log('LocalStorage cleared');
+                
+                // Clear caches
+                if ('caches' in window) {
+                    const cacheNames = await caches.keys();
+                    await Promise.all(cacheNames.map(name => caches.delete(name)));
+                    devLog.log(`${cacheNames.length} cache(s) cleared`);
+                }
+                
+                // Unregister Service Workers
+                if ('serviceWorker' in navigator) {
+                    const registrations = await navigator.serviceWorker.getRegistrations();
+                    await Promise.all(registrations.map(reg => reg.unregister()));
+                    devLog.log(`${registrations.length} SW(s) unregistered`);
+                }
+                
+                devLog.log('All data cleared! Reloading...', 'warn');
+                setTimeout(() => reloadFrame(), 1000);
+            }
+        }
+
+        function clearLog() {
+            document.getElementById('devLog').innerHTML = '';
+            devLog.messages = [];
+            devLog.log('Log cleared');
+        }
+
+        function exportLog() {
+            const logContent = devLog.messages.join('\n');
+            const blob = new Blob([logContent], { type: 'text/plain' });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = `dev-log-${new Date().toISOString().slice(0,19).replace(/:/g,'-')}.txt`;
+            a.click();
+            URL.revokeObjectURL(url);
+            devLog.log('Log exported');
+        }
+
+        // Monitor connection and frame status
+        setInterval(() => {
+            const status = document.getElementById('dev-status');
+            const isOnline = navigator.onLine;
+            if (status.textContent === '● READY') {
+                status.textContent = isOnline ? '● ONLINE' : '● OFFLINE';
+                status.style.color = isOnline ? '#4CAF50' : '#ff6b6b';
+            }
+        }, 5000);
+
+        // Global dev helpers
+        window.devRunner = {
+            log: devLog.log,
+            reload: reloadFrame,
+            check: checkFiles,
+            inspect: inspectManifest,
+            testSW: testServiceWorker,
+            clear: clearAllData,
+            getFrame: () => document.getElementById('app-frame'),
+            openOriginal: () => window.open('index.html', '_blank')
+        };
+
+        // Initialize
+        window.addEventListener('load', () => {
+            devLog.log('🔧 Dev Runner initialized');
+            devLog.log('Loading index.html in iframe...');
+            devLog.log('Use devRunner.* commands in console');
+        });
+
+        // Handle frame load errors
+        document.getElementById('app-frame').addEventListener('error', (e) => {
+            devLog.log('Frame load error', 'error');
+            document.getElementById('loading').innerHTML = '<div style="color: #ff4444;">❌ Failed to load index.html</div>';
+        });
+    </script>
+</body>
+</html>
