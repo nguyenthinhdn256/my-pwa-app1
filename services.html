@@ -19,7 +19,7 @@
             align-items: center;
             margin-bottom: 30px;
             flex-wrap: wrap;
-            gap: 15px;
+            gap: 20px;
         }
 
         .page-header h1 {
@@ -47,57 +47,110 @@
             transform: translateY(-2px);
         }
 
-        .service-tabs {
-            display: flex;
-            gap: 15px;
-            padding: 20px 0;
-            flex-wrap: wrap;
-            justify-content: center;
-            background: rgba(255,255,255,0.05);
-            border-radius: 15px;
+        /* Main Service Categories */
+        .main-categories {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
+            gap: 20px;
             margin-bottom: 30px;
+            max-height: 70vh;
+            overflow-y: auto;
+            justify-items: center;
         }
 
-        .service-tab {
-            background: rgba(255,255,255,0.2);
-            color: white;
-            border: none;
-            padding: 15px 25px;
-            border-radius: 25px;
+        .category-card {
+            background: linear-gradient(135deg, rgba(255,255,255,0.1) 0%, rgba(255,255,255,0.05) 100%);
+            padding: 15px;
+            border-radius: 12px;
             cursor: pointer;
-            font-size: 16px;
-            font-weight: bold;
             transition: all 0.3s;
-            flex: 1;
-            min-width: 150px;
+            backdrop-filter: blur(10px);
+            border: 2px solid transparent;
+            text-align: center;
+            position: relative;
+            overflow: hidden;
+            min-height: 100px;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            width: 120px;
         }
 
-        .service-tab:hover {
-            background: rgba(255,255,255,0.3);
-            transform: translateY(-3px);
+        .category-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: linear-gradient(45deg, transparent, rgba(255,255,255,0.1), transparent);
+            transform: translateX(-100%);
+            transition: transform 0.6s;
         }
 
-        .service-tab.active {
-            background: #4CAF50;
-            box-shadow: 0 6px 20px rgba(76, 175, 80, 0.4);
+        .category-card:hover::before {
+            transform: translateX(100%);
         }
 
-        .service-content {
-            min-height: 400px;
+        .category-card:hover {
+            background: linear-gradient(135deg, rgba(255,255,255,0.2) 0%, rgba(255,255,255,0.1) 100%);
+            transform: translateY(-10px);
+            box-shadow: 0 15px 35px rgba(0,0,0,0.3);
+            border-color: rgba(255,255,255,0.3);
         }
 
-        .service-panel {
+        .category-icon {
+            font-size: 2em;
+            margin-bottom: 8px;
+            display: block;
+        }
+
+        .category-name {
+            font-size: 0.9em;
+            font-weight: bold;
+            margin-bottom: 5px;
+            color: white;
+            line-height: 1.1;
+        }
+
+        .category-description {
+            font-size: 0.7em;
+            opacity: 0.8;
+            line-height: 1.2;
             display: none;
         }
 
-        .service-panel.active {
+        .category-count {
+            position: absolute;
+            top: 5px;
+            right: 5px;
+            background: #4CAF50;
+            color: white;
+            padding: 2px 6px;
+            border-radius: 10px;
+            font-size: 9px;
+            font-weight: bold;
+        }
+
+        /* Service Details View */
+        .service-details {
+            display: none;
+            animation: fadeIn 0.4s ease-in;
+        }
+
+        .service-details.active {
             display: block;
-            animation: fadeIn 0.3s ease-in;
         }
 
         @keyframes fadeIn {
-            from { opacity: 0; transform: translateY(20px); }
-            to { opacity: 1; transform: translateY(0); }
+            from { 
+                opacity: 0;
+                transform: translateY(20px);
+            }
+            to { 
+                opacity: 1;
+                transform: translateY(0);
+            }
         }
 
         .service-header {
@@ -108,12 +161,38 @@
             padding: 20px;
             background: rgba(255,255,255,0.1);
             border-radius: 15px;
+            flex-wrap: wrap;
+            gap: 15px;
         }
 
-        .service-header h2 {
+        .service-title {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            margin: 0;
+        }
+
+        .service-title h2 {
             margin: 0;
             font-size: 1.5em;
             color: white;
+        }
+
+        .back-to-menu-btn {
+            background: #9C27B0;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 20px;
+            cursor: pointer;
+            font-size: 14px;
+            font-weight: bold;
+            transition: all 0.3s;
+        }
+
+        .back-to-menu-btn:hover {
+            background: #7B1FA2;
+            transform: translateY(-2px);
         }
 
         .create-service-btn {
@@ -349,31 +428,160 @@
             background: rgba(255,255,255,0.3);
         }
 
+        /* Empty State */
+        .empty-state {
+            text-align: center;
+            padding: 40px 20px;
+            opacity: 0.7;
+        }
+
+        .empty-state-icon {
+            font-size: 3em;
+            margin-bottom: 15px;
+        }
+
+        /* Mobile Responsive */
         @media (max-width: 768px) {
-            .services-grid {
-                grid-template-columns: 1fr;
-            }
-            
-            .service-tabs {
-                flex-direction: column;
-                gap: 10px;
-            }
-            
-            .service-tab {
-                min-width: auto;
+            body {
+                padding: 10px;
             }
             
             .page-header {
-                flex-direction: column;
-                text-align: center;
+                flex-direction: row;
+                text-align: left;
+                align-items: center;
+                justify-content: space-between;
+                margin-bottom: 25px;
             }
             
             .page-header h1 {
-                font-size: 1.5em;
+                font-size: 1.3em;
+                margin: 0;
+            }
+
+            .back-btn {
+                padding: 8px 15px;
+                font-size: 12px;
+                white-space: nowrap;
+            }
+
+            .main-categories {
+                display: grid;
+                grid-template-columns: repeat(2, 1fr);
+                gap: 25px;
+                justify-content: center;
+                max-width: 320px;
+                margin: 0 auto 30px auto;
+                height: auto;
+                max-height: none;
+                overflow: visible;
+            }
+
+            .category-card {
+                padding: 10px;
+                min-height: 80px;
+                height: 80px;
+                width: 100%;
+                max-width: 140px;
+                justify-self: center;
+                border-radius: 10px;
+            }
+
+            /* Đặc biệt cho tab thứ 5 - căn giữa */
+            .category-card:nth-child(5) {
+                grid-column: 1 / -1;
+                justify-self: center;
+                max-width: 140px;
+            }
+            
+            .services-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .service-header {
+                flex-direction: column;
+                text-align: center;
             }
 
             .service-actions {
                 justify-content: center;
+            }
+
+            .category-icon {
+                font-size: 1.4em;
+                margin-bottom: 5px;
+            }
+
+            .category-name {
+                font-size: 0.9em;
+                margin-bottom: 0;
+                text-align: center;
+                line-height: 1.1;
+                word-wrap: break-word;
+                hyphens: auto;
+            }
+
+            .category-description {
+                display: none;
+            }
+
+            .category-count {
+                top: 3px;
+                right: 3px;
+                padding: 2px 4px;
+                font-size: 8px;
+                border-radius: 8px;
+            }
+        }
+
+        @media (max-width: 480px) {
+            body {
+                padding: 8px;
+            }
+
+            .page-header {
+                margin-bottom: 20px;
+            }
+
+            .page-header h1 {
+                font-size: 1.1em;
+            }
+
+            .back-btn {
+                padding: 6px 12px;
+                font-size: 11px;
+            }
+
+            .main-categories {
+                gap: 20px;
+                max-width: 300px;
+            }
+
+            .category-card {
+                padding: 8px;
+                min-height: 70px;
+                height: 70px;
+                max-width: 130px;
+            }
+
+            .category-card:nth-child(5) {
+                max-width: 130px;
+            }
+
+            .category-icon {
+                font-size: 1.2em;
+                margin-bottom: 3px;
+            }
+
+            .category-name {
+                font-size: 0.85em;
+            }
+
+            .category-count {
+                top: 2px;
+                right: 2px;
+                padding: 1px 3px;
+                font-size: 7px;
             }
         }
     </style>
@@ -384,68 +592,60 @@
         <button class="back-btn" onclick="goBack()">← Quay Lại</button>
     </div>
     
-    <div class="service-tabs">
-        <button class="service-tab active" onclick="showServiceTab('wash')">🧴 Gội Đầu</button>
-        <button class="service-tab" onclick="showServiceTab('health')">💪 Sức Khỏe</button>
-        <button class="service-tab" onclick="showServiceTab('facial')">✨ Chăm Sóc Mặt</button>
-        <button class="service-tab" onclick="showServiceTab('hair')">💇 Chăm Sóc Tóc</button>
-        <button class="service-tab" onclick="showServiceTab('combo')">🎁 Gói Combo Phục Hồi</button>
+    <!-- Main Category View -->
+    <div id="categoryView" class="category-view">
+        <div class="main-categories">
+            <div class="category-card" onclick="showServiceCategory('wash')">
+                <span class="category-count" id="wash-count">0</span>
+                <span class="category-icon">🧴</span>
+                <div class="category-name">Gội Đầu</div>
+                <div class="category-description">Dịch vụ gội đầu chuyên nghiệp với các sản phẩm thảo dược cao cấp</div>
+            </div>
+
+            <div class="category-card" onclick="showServiceCategory('health')">
+                <span class="category-count" id="health-count">0</span>
+                <span class="category-icon">💪</span>
+                <div class="category-name">Sức Khỏe</div>
+                <div class="category-description">Massage thư giãn, trị liệu phục hồi sức khỏe toàn diện</div>
+            </div>
+
+            <div class="category-card" onclick="showServiceCategory('facial')">
+                <span class="category-count" id="facial-count">0</span>
+                <span class="category-icon">✨</span>
+                <div class="category-name">Chăm Sóc Mặt</div>
+                <div class="category-description">Làm sạch, dưỡng da mặt với công nghệ và sản phẩm hiện đại</div>
+            </div>
+
+            <div class="category-card" onclick="showServiceCategory('hair')">
+                <span class="category-count" id="hair-count">0</span>
+                <span class="category-icon">💇</span>
+                <div class="category-name">Chăm Sóc Tóc</div>
+                <div class="category-description">Cắt, nhuộm, uốn tóc theo phong cách cá nhân</div>
+            </div>
+
+            <div class="category-card" onclick="showServiceCategory('combo')">
+                <span class="category-count" id="combo-count">0</span>
+                <span class="category-icon">🎁</span>
+                <div class="category-name">Gói Combo Phục Hồi</div>
+                <div class="category-description">Gói dịch vụ tổng hợp với giá ưu đãi, trải nghiệm hoàn hảo</div>
+            </div>
+        </div>
     </div>
-    
-    <div class="service-content">
-        <!-- Gội Đầu -->
-        <div id="wash" class="service-panel active">
-            <div class="service-header">
-                <h2>🧴 Danh Sách Dịch Vụ Gội Đầu</h2>
-                <button class="create-service-btn" onclick="showCreateServiceModal('wash')">+ Tạo Dịch Vụ</button>
+
+    <!-- Service Details View -->
+    <div id="serviceDetails" class="service-details">
+        <div class="service-header">
+            <div class="service-title">
+                <span id="current-category-icon"></span>
+                <h2 id="current-category-title">Danh Sách Dịch Vụ</h2>
             </div>
-            <div class="services-grid" id="wash-grid">
-                <!-- Services will be loaded here -->
-            </div>
-        </div>
-        
-        <!-- Sức Khỏe -->
-        <div id="health" class="service-panel">
-            <div class="service-header">
-                <h2>💪 Danh Sách Dịch Vụ Sức Khỏe</h2>
-                <button class="create-service-btn" onclick="showCreateServiceModal('health')">+ Tạo Dịch Vụ</button>
-            </div>
-            <div class="services-grid" id="health-grid">
-                <!-- Services will be loaded here -->
+            <div style="display: flex; gap: 10px; flex-wrap: wrap;">
+                <button class="back-to-menu-btn" onclick="showCategoryView()">← Về Menu</button>
+                <button class="create-service-btn" onclick="showCreateServiceModal()">+ Tạo Dịch Vụ</button>
             </div>
         </div>
-        
-        <!-- Chăm Sóc Mặt -->
-        <div id="facial" class="service-panel">
-            <div class="service-header">
-                <h2>✨ Danh Sách Dịch Vụ Chăm Sóc Mặt</h2>
-                <button class="create-service-btn" onclick="showCreateServiceModal('facial')">+ Tạo Dịch Vụ</button>
-            </div>
-            <div class="services-grid" id="facial-grid">
-                <!-- Services will be loaded here -->
-            </div>
-        </div>
-        
-        <!-- Chăm Sóc Tóc -->
-        <div id="hair" class="service-panel">
-            <div class="service-header">
-                <h2>💇 Danh Sách Dịch Vụ Chăm Sóc Tóc</h2>
-                <button class="create-service-btn" onclick="showCreateServiceModal('hair')">+ Tạo Dịch Vụ</button>
-            </div>
-            <div class="services-grid" id="hair-grid">
-                <!-- Services will be loaded here -->
-            </div>
-        </div>
-        
-        <!-- Gói Combo -->
-        <div id="combo" class="service-panel">
-            <div class="service-header">
-                <h2>🎁 Danh Sách Gói Combo Phục Hồi</h2>
-                <button class="create-service-btn" onclick="showCreateServiceModal('combo')">+ Tạo Dịch Vụ</button>
-            </div>
-            <div class="services-grid" id="combo-grid">
-                <!-- Services will be loaded here -->
-            </div>
+        <div class="services-grid" id="services-grid">
+            <!-- Services will be loaded here -->
         </div>
     </div>
 
@@ -486,6 +686,15 @@
         let editingServiceId = null;
         let allServices = {};
 
+        // Category info mapping
+        const categoryInfo = {
+            wash: { icon: '🧴', title: 'Danh Sách Dịch Vụ Gội Đầu' },
+            health: { icon: '💪', title: 'Danh Sách Dịch Vụ Sức Khỏe' },
+            facial: { icon: '✨', title: 'Danh Sách Dịch Vụ Chăm Sóc Mặt' },
+            hair: { icon: '💇', title: 'Danh Sách Dịch Vụ Chăm Sóc Tóc' },
+            combo: { icon: '🎁', title: 'Danh Sách Gói Combo Phục Hồi' }
+        };
+
         // Default services data
         const defaultServicesData = {
             wash: [
@@ -520,7 +729,8 @@
         // Load data when page loads
         window.onload = function() {
             loadAllServices();
-            renderAllServices();
+            updateCategoryCounts();
+            showCategoryView();
         }
 
         function loadAllServices() {
@@ -528,7 +738,6 @@
             if (savedServices) {
                 allServices = JSON.parse(savedServices);
             } else {
-                // Initialize with default services
                 allServices = JSON.parse(JSON.stringify(defaultServicesData));
                 saveAllServices();
             }
@@ -538,17 +747,55 @@
             localStorage.setItem('allServices', JSON.stringify(allServices));
         }
 
-        function renderAllServices() {
+        function updateCategoryCounts() {
             for (const category in allServices) {
-                renderServicesForCategory(category);
+                const count = allServices[category] ? allServices[category].length : 0;
+                const countElement = document.getElementById(category + '-count');
+                if (countElement) {
+                    countElement.textContent = count;
+                }
             }
         }
 
+        function showCategoryView() {
+            document.getElementById('categoryView').style.display = 'block';
+            document.getElementById('serviceDetails').classList.remove('active');
+            currentServiceCategory = '';
+        }
+
+        function showServiceCategory(category) {
+            currentServiceCategory = category;
+            const categoryData = categoryInfo[category];
+            
+            // Update header
+            document.getElementById('current-category-icon').textContent = categoryData.icon;
+            document.getElementById('current-category-title').textContent = categoryData.title;
+            
+            // Hide category view and show service details
+            document.getElementById('categoryView').style.display = 'none';
+            document.getElementById('serviceDetails').classList.add('active');
+            
+            // Render services for this category
+            renderServicesForCategory(category);
+        }
+
         function renderServicesForCategory(category) {
-            const grid = document.getElementById(category + '-grid');
+            const grid = document.getElementById('services-grid');
             if (!grid) return;
 
             const services = allServices[category] || [];
+            
+            if (services.length === 0) {
+                grid.innerHTML = `
+                    <div class="empty-state">
+                        <div class="empty-state-icon">${categoryInfo[category].icon}</div>
+                        <p>Chưa có dịch vụ nào trong danh mục này</p>
+                        <p style="font-size: 14px; opacity: 0.7;">Nhấn "Tạo Dịch Vụ" để thêm dịch vụ mới</p>
+                    </div>
+                `;
+                return;
+            }
+
             grid.innerHTML = services.map(service => `
                 <div class="service-item">
                     <div class="service-name">${service.name}</div>
@@ -576,30 +823,12 @@
             }
         }
 
-        function showServiceTab(tabName) {
-            // Remove active from all tabs
-            document.querySelectorAll('.service-tab').forEach(tab => {
-                tab.classList.remove('active');
-            });
-            
-            // Hide all panels
-            document.querySelectorAll('.service-panel').forEach(panel => {
-                panel.classList.remove('active');
-                panel.style.display = 'none';
-            });
-            
-            // Show clicked tab and panel
-            const clickedTab = event.target;
-            clickedTab.classList.add('active');
-            const panel = document.getElementById(tabName);
-            if (panel) {
-                panel.classList.add('active');
-                panel.style.display = 'block';
+        function showCreateServiceModal() {
+            if (!currentServiceCategory) {
+                alert('Vui lòng chọn danh mục dịch vụ trước!');
+                return;
             }
-        }
-
-        function showCreateServiceModal(category) {
-            currentServiceCategory = category;
+            
             editingServiceId = null;
             document.querySelector('.modal-title').textContent = 'Thêm Dịch Vụ Mới';
             document.querySelector('.btn-primary').textContent = 'Thêm';
@@ -615,7 +844,6 @@
                 return;
             }
 
-            currentServiceCategory = category;
             editingServiceId = serviceId;
             document.querySelector('.modal-title').textContent = 'Chỉnh Sửa Dịch Vụ';
             document.querySelector('.btn-primary').textContent = 'Cập nhật';
@@ -636,13 +864,13 @@
                 allServices[category] = allServices[category].filter(s => s.id !== serviceId);
                 saveAllServices();
                 renderServicesForCategory(category);
+                updateCategoryCounts();
             }
         }
 
         function closeServiceModal() {
             document.getElementById('serviceModal').style.display = 'none';
             document.body.style.overflow = 'auto';
-            currentServiceCategory = '';
             editingServiceId = null;
         }
 
@@ -674,7 +902,6 @@
             }
             
             if (editingServiceId) {
-                // Edit existing service
                 const serviceIndex = allServices[currentServiceCategory].findIndex(s => s.id === editingServiceId);
                 if (serviceIndex !== -1) {
                     allServices[currentServiceCategory][serviceIndex] = {
@@ -686,7 +913,6 @@
                     };
                 }
             } else {
-                // Create new service
                 const newService = {
                     id: 'custom_' + Date.now(),
                     name: serviceName,
@@ -704,6 +930,7 @@
             
             saveAllServices();
             renderServicesForCategory(currentServiceCategory);
+            updateCategoryCounts();
             closeServiceModal();
         }
 
